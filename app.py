@@ -2,10 +2,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 import os
 
 # Get absolute path for database
@@ -26,7 +27,7 @@ Base = declarative_base()
 app = FastAPI()
 
 # Mount the static files directory
-app.mount("/static", StaticFiles(directory="."), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,6 +50,7 @@ class Item(Base):
     name = Column(String, index=True)
     link = Column(String)
     purchased = Column(Boolean, default=False)
+    purchase_date = Column(DateTime, nullable=True)
     wishlist_id = Column(Integer, ForeignKey('wishlists.id'))
     wishlist = relationship("Wishlist", back_populates="items")
 
@@ -97,7 +99,7 @@ def read_wishlists():
             "id": wishlist.id,
             "name": wishlist.name,
             "person": wishlist.person,
-            "items": [{"id": item.id, "name": item.name, "link": item.link, "purchased": item.purchased} 
+            "items": [{"id": item.id, "name": item.name, "link": item.link, "purchased": item.purchased, "purchase_date": item.purchase_date} 
                      for item in wishlist.items]
         })
     db.close()
@@ -125,17 +127,33 @@ def delete_item(item_id: int):
     db.close()
     raise HTTPException(status_code=404, detail="Item not found")
 
-@app.put("/items/{item_id}/purchase/")
+@app.post("/items/{item_id}/purchase")
 def purchase_item(item_id: int):
     db = SessionLocal()
     item = db.query(Item).filter(Item.id == item_id).first()
-    if item:
-        item.purchased = not item.purchased  # Toggle the purchased status
-        db.commit()
+    if not item:
         db.close()
-        return item
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    item.purchased = not item.purchased
+    if item.purchased:
+        item.purchase_date = datetime.now()
+    else:
+        item.purchase_date = None
+    
+    db.commit()
+    
+    # Create response with the updated item
+    response = {
+        "id": item.id,
+        "name": item.name,
+        "link": item.link,
+        "purchased": item.purchased,
+        "purchase_date": item.purchase_date.isoformat() if item.purchase_date else None
+    }
+    
     db.close()
-    raise HTTPException(status_code=404, detail="Item not found")
+    return response
 
 @app.get("/")
 async def read_root():
