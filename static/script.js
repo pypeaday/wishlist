@@ -98,7 +98,7 @@ async function fetchWishlists() {
                 </div>
                 
                 <div id="wishlist-content-${wishlist.id}" class="p-6 bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt/30">
-                    <div class="flex gap-4 mb-6">
+                    <form onsubmit="addItem(${wishlist.id}, event)" class="flex gap-4 mb-6">
                         <input type="text" id="new-item-name-${wishlist.id}" placeholder="Item Name" 
                             class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surface dark:bg-theme-dark-surface border border-theme-light-border dark:border-theme-dark-border/20
                                    text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
@@ -109,11 +109,11 @@ async function fetchWishlists() {
                                    text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
                                    focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
                                    transition-colors">
-                        <button onclick="addItem(${wishlist.id})" class="px-6 py-2 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
+                        <button type="submit" class="px-6 py-2 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
                                      hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl">
                             Add Item
                         </button>
-                    </div>
+                    </form>
                     
                     <div class="overflow-hidden rounded-lg border border-theme-light-border dark:border-theme-dark-border/10">
                         <table class="w-full">
@@ -152,7 +152,7 @@ async function fetchWishlists() {
                                             </button>
                                         </td>
                                         <td class="px-4 py-2 text-center">
-                                            <button onclick="deleteItem(${item.id})" 
+                                            <button onclick="deleteItem(${item.id}, '${item.name}')" 
                                                 class="bg-theme-light-danger/20 text-theme-light-danger dark:bg-theme-dark-danger/20 dark:text-theme-dark-danger px-3 py-1 rounded hover:opacity-80 transition-opacity">
                                                 Delete
                                             </button>
@@ -215,7 +215,11 @@ function toggleWishlist(wishlistId) {
     }
 }
 
-async function addItem(wishlistId) {
+async function addItem(wishlistId, event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
     const nameInput = document.getElementById(`new-item-name-${wishlistId}`);
     const linkInput = document.getElementById(`new-item-link-${wishlistId}`);
     const name = nameInput.value.trim();
@@ -259,9 +263,14 @@ async function togglePurchased(itemId) {
     }
 }
 
-async function deleteItem(itemId) {
+async function deleteItem(itemId, itemName) {
+    // Ask for confirmation
+    if (!confirm(`Are you sure you want to delete "${itemName}" from this wishlist?`)) {
+        return;
+    }
+
     try {
-        await fetch(`/items/${itemId}/`, { method: 'DELETE' });
+        await fetch(`/items/${itemId}`, { method: 'DELETE' });
         fetchWishlists();
     } catch (error) {
         console.error('Error deleting item:', error);

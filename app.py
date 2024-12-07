@@ -173,6 +173,10 @@ def delete_wishlist(wishlist_id: int):
     
     return {"message": f"Wishlist and {item_count} items deleted successfully"}
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 @app.get("/")
 async def read_root():
     return FileResponse('index.html')
