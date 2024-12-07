@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist App - Creator</title>
+    <link rel="icon" href="https://cdn.statically.io/avatar/shape=circle/pw" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            dark: {
+                                bg: '#171923',
+                                surface: '#2A313C',
+                                surfaceAlt: '#3B4252',
+                                primary: '#81A1C1',
+                                secondary: '#88C0D0',
+                                text: '#ECEFF4',
+                                textMuted: '#D8DEE9',
+                                accent: '#B48EAD',
+                                border: '#434C5E',
+                                success: '#A3BE8C',
+                                warning: '#EBCB8B',
+                                danger: '#BF616A'
+                            },
+                            light: {
+                                bg: '#f5f5f4',
+                                surface: '#ffffff',
+                                surfaceAlt: '#f0f0ef',
+                                primary: '#5c7b9a',
+                                secondary: '#83a598',
+                                text: '#3c4148',
+                                textMuted: '#6e7681',
+                                accent: '#7c6f64',
+                                border: '#e5e5e4',
+                                success: '#98971a',
+                                warning: '#d79921',
+                                danger: '#cc6666'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen bg-theme-light-bg dark:bg-theme-dark-bg text-theme-light-text dark:text-theme-dark-text font-['Inter'] antialiased transition-colors">
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <h1 class="text-4xl font-semibold tracking-tight">Wishlist App</h1>
+                <span class="px-3 py-1 rounded-full text-sm font-medium bg-theme-light-accent/10 text-theme-light-accent dark:bg-theme-dark-accent/10 dark:text-theme-dark-accent">
+                    Creator Mode
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="switchRole()" class="px-4 py-2 rounded-lg bg-theme-light-primary/10 text-theme-light-primary dark:bg-theme-dark-primary/10 dark:text-theme-dark-primary hover:opacity-90 transition-opacity">
+                    Switch to Viewer
+                </button>
+                <button id="theme-toggle" class="p-2 rounded-lg bg-theme-light-surface dark:bg-theme-dark-surface hover:bg-theme-light-surfaceAlt dark:hover:bg-theme-dark-surfaceAlt transition-colors">
+                    <svg id="theme-toggle-dark-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 overflow-hidden border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
+            <button onclick="toggleHelp()" class="w-full p-4 text-left flex justify-between items-center hover:bg-theme-light-surfaceAlt dark:hover:bg-theme-dark-surfaceAlt/30 transition-colors">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-theme-light-primary dark:text-theme-dark-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="font-medium">How to Use the Wishlist App</span>
+                </div>
+                <svg id="help-chevron" class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div id="help-content" class="hidden p-4 space-y-4 bg-theme-light-surfaceAlt/50 dark:bg-theme-dark-surfaceAlt/30">
+                <p>As a creator, you can:</p>
+                <ul class="list-disc list-inside space-y-2 ml-4">
+                    <li>Create new wishlists</li>
+                    <li>Add items to wishlists</li>
+                    <li>Delete items or entire wishlists</li>
+                    <li>Mark items as purchased</li>
+                    <li>Switch to viewer mode to see how others will view your lists</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Create Wishlist Section -->
+        <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 p-4 sm:p-8 border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-6 tracking-tight">Create New Wishlist</h2>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" id="wishlist-name" placeholder="Wishlist Name" required
+                    class="flex-1 px-4 py-3 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt border border-theme-light-border dark:border-theme-dark-border/20
+                           text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                           focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50 transition-colors">
+                <input type="text" id="wishlist-person" placeholder="For Whom?" required
+                    class="flex-1 px-4 py-3 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt border border-theme-light-border dark:border-theme-dark-border/20
+                           text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                           focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50 transition-colors">
+                <button id="add-wishlist" class="px-6 py-3 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
+                                                hover:opacity-90 transition-all duration-200 font-medium shadow-md hover:shadow-lg
+                                                w-full sm:w-auto whitespace-nowrap">
+                    Create Wishlist
+                </button>
+            </div>
+        </div>
+
+        <!-- Wishlists Container -->
+        <div id="wishlists-container" class="space-y-6 max-w-3xl mx-auto">
+            <!-- Wishlists will be dynamically added here -->
+        </div>
+    </div>
+    <script src="/static/creator.js"></script>
+</body>
+</html>

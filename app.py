@@ -1,13 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Cookie, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Boolean, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Boolean, DateTime, Enum
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Literal
 from datetime import datetime
 import os
+import enum
+import logging
 
 # Database configuration
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -16,10 +18,13 @@ DB_PATH = os.getenv("WISHLIST_DB_PATH", os.path.join(DATA_DIR, "wishlists.db"))
 
 print(f"Using database at: {DB_PATH}")
 
+# Configure logging
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
+
 engine = create_engine(
     f"sqlite:///{DB_PATH}", 
     connect_args={"check_same_thread": False},
-    echo=True  # This will log all SQL statements
+    echo=False  # Disable SQL statement logging
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -35,7 +40,13 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Set-Cookie"]
 )
+
+# User role enum
+class UserRole(str, enum.Enum):
+    VIEWER = "viewer"
+    CREATOR = "creator"
 
 class Wishlist(Base):
     __tablename__ = "wishlists"
@@ -78,8 +89,50 @@ class ItemCreate(BaseModel):
     name: str
     link: Optional[str] = None
 
+class SetRole(BaseModel):
+    role: UserRole
+
+@app.post("/set-role")
+def set_user_role(role_data: SetRole, response: Response):
+    role_value = role_data.role.value
+    print(f"Setting role to: {role_data.role}, value: {role_value}, type: {type(role_data.role)}")
+    response.set_cookie(
+        key="user_role",
+        value=role_value,
+        max_age=31536000,
+        httponly=False,
+        samesite='lax',
+        path='/',
+        secure=False  # Allow non-HTTPS for development
+    )
+    return {"message": f"Role set to {role_value}"}
+
+@app.get("/get-role")
+def get_user_role(user_role: Optional[str] = Cookie(None)):
+    print(f"Getting role: {user_role}, type: {type(user_role)}")
+    return {"role": user_role or UserRole.VIEWER.value}
+
+@app.get("/")
+def read_root(user_role: Optional[str] = Cookie(None)):
+    print(f"Root endpoint - received role: {user_role}, type: {type(user_role)}")
+    try:
+        if user_role == "creator":
+            print("Serving creator.html")
+            return FileResponse("static/creator.html")
+        elif user_role == "viewer":
+            print("Serving viewer.html")
+            return FileResponse("static/viewer.html")
+        else:
+            print(f"No valid role found (was: {user_role}), serving viewer.html")
+            return FileResponse("static/viewer.html")
+    except Exception as e:
+        print(f"Error in read_root: {e}, user_role: {user_role}")
+        return FileResponse("static/viewer.html")
+
 @app.post("/wishlists/")
-def create_wishlist(wishlist: WishlistCreate):
+def create_wishlist(wishlist: WishlistCreate, user_role: Optional[str] = Cookie(None)):
+    if user_role != UserRole.CREATOR.value:
+        raise HTTPException(status_code=403, detail="Only creators can create wishlists")
     db = SessionLocal()
     db_wishlist = Wishlist(name=wishlist.name, person=wishlist.person)
     db.add(db_wishlist)
@@ -89,7 +142,7 @@ def create_wishlist(wishlist: WishlistCreate):
     return db_wishlist
 
 @app.get("/wishlists/")
-def read_wishlists():
+def read_wishlists(user_role: Optional[str] = Cookie(None)):
     db = SessionLocal()
     wishlists = db.query(Wishlist).all()
     # Convert to dict to include items
@@ -106,7 +159,9 @@ def read_wishlists():
     return result
 
 @app.post("/wishlists/{wishlist_id}/items/")
-def create_item(wishlist_id: int, item: ItemCreate):
+def create_item(wishlist_id: int, item: ItemCreate, user_role: Optional[str] = Cookie(None)):
+    if user_role != UserRole.CREATOR.value:
+        raise HTTPException(status_code=403, detail="Only creators can add items")
     db = SessionLocal()
     db_item = Item(name=item.name, link=item.link, wishlist_id=wishlist_id)
     db.add(db_item)
@@ -115,71 +170,70 @@ def create_item(wishlist_id: int, item: ItemCreate):
     db.close()
     return db_item
 
-@app.delete("/items/{item_id}/")
-def delete_item(item_id: int):
-    db = SessionLocal()
-    item = db.query(Item).filter(Item.id == item_id).first()
-    if item:
-        db.delete(item)
-        db.commit()
-        db.close()
-        return {"message": "Item deleted successfully"}
-    db.close()
-    raise HTTPException(status_code=404, detail="Item not found")
-
-@app.post("/items/{item_id}/purchase")
-def purchase_item(item_id: int):
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int, user_role: Optional[str] = Cookie(None)):
+    if user_role != UserRole.CREATOR.value:
+        raise HTTPException(status_code=403, detail="Only creators can delete items")
     db = SessionLocal()
     item = db.query(Item).filter(Item.id == item_id).first()
     if not item:
         db.close()
         raise HTTPException(status_code=404, detail="Item not found")
-    
-    item.purchased = not item.purchased
-    if item.purchased:
-        item.purchase_date = datetime.now()
-    else:
-        item.purchase_date = None
-    
+    db.delete(item)
     db.commit()
-    
-    # Create response with the updated item
-    response = {
-        "id": item.id,
-        "name": item.name,
-        "link": item.link,
-        "purchased": item.purchased,
-        "purchase_date": item.purchase_date.isoformat() if item.purchase_date else None
-    }
-    
     db.close()
-    return response
+    return {"message": "Item deleted"}
+
+@app.post("/items/{item_id}/purchase")
+def purchase_item(item_id: int, user_role: Optional[str] = Cookie(None)):
+    # Allow both viewers and creators to toggle purchase status
+    db = SessionLocal()
+    item = db.query(Item).filter(Item.id == item_id).first()
+    
+    if not item:
+        db.close()
+        raise HTTPException(status_code=404, detail="Item not found")
+    
+    try:
+        # Toggle the purchased status
+        item.purchased = not item.purchased
+        # Update purchase date only when marking as purchased
+        if item.purchased:
+            item.purchase_date = datetime.now()
+        else:
+            item.purchase_date = None
+            
+        db.commit()
+        
+        # Return the new status so the frontend can update accordingly
+        return {
+            "id": item.id,
+            "purchased": item.purchased,
+            "purchase_date": item.purchase_date.isoformat() if item.purchase_date else None
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
 
 @app.delete("/wishlists/{wishlist_id}")
-def delete_wishlist(wishlist_id: int):
+def delete_wishlist(wishlist_id: int, user_role: Optional[str] = Cookie(None)):
+    if user_role != UserRole.CREATOR.value:
+        raise HTTPException(status_code=403, detail="Only creators can delete wishlists")
     db = SessionLocal()
     wishlist = db.query(Wishlist).filter(Wishlist.id == wishlist_id).first()
     if not wishlist:
         db.close()
         raise HTTPException(status_code=404, detail="Wishlist not found")
-    
-    # Get the count of items for the response
-    item_count = len(wishlist.items)
-    
-    # Delete the wishlist (items will be cascade deleted due to relationship setting)
     db.delete(wishlist)
     db.commit()
     db.close()
-    
-    return {"message": f"Wishlist and {item_count} items deleted successfully"}
+    return {"message": "Wishlist deleted"}
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
-@app.get("/")
-async def read_root():
-    return FileResponse('index.html')
 
 if __name__ == "__main__":
     import uvicorn
