@@ -155,6 +155,24 @@ def purchase_item(item_id: int):
     db.close()
     return response
 
+@app.delete("/wishlists/{wishlist_id}")
+def delete_wishlist(wishlist_id: int):
+    db = SessionLocal()
+    wishlist = db.query(Wishlist).filter(Wishlist.id == wishlist_id).first()
+    if not wishlist:
+        db.close()
+        raise HTTPException(status_code=404, detail="Wishlist not found")
+    
+    # Get the count of items for the response
+    item_count = len(wishlist.items)
+    
+    # Delete the wishlist (items will be cascade deleted due to relationship setting)
+    db.delete(wishlist)
+    db.commit()
+    db.close()
+    
+    return {"message": f"Wishlist and {item_count} items deleted successfully"}
+
 @app.get("/")
 async def read_root():
     return FileResponse('index.html')

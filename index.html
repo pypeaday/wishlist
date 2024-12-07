@@ -61,7 +61,7 @@
 <body class="min-h-screen bg-theme-light-bg dark:bg-theme-dark-bg text-theme-light-text dark:text-theme-dark-text font-['Inter'] antialiased transition-colors">
     <div class="container mx-auto px-4 py-8 max-w-5xl">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-12">
+        <div class="flex justify-between items-center mb-6">
             <h1 class="text-4xl font-semibold tracking-tight">Wishlist App</h1>
             <button id="theme-toggle" class="p-2 rounded-lg bg-theme-light-surface dark:bg-theme-dark-surface hover:bg-theme-light-surfaceAlt dark:hover:bg-theme-dark-surfaceAlt transition-colors">
                 <svg id="theme-toggle-dark-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -72,7 +72,52 @@
                 </svg>
             </button>
         </div>
-        
+
+        <!-- Help Section -->
+        <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 overflow-hidden border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
+            <button onclick="toggleHelp()" class="w-full p-4 text-left flex justify-between items-center hover:bg-theme-light-surfaceAlt dark:hover:bg-theme-dark-surfaceAlt/30 transition-colors">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-theme-light-primary dark:text-theme-dark-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="font-medium">How to Use the Wishlist App</span>
+                </div>
+                <svg id="help-chevron" class="w-5 h-5 transform transition-transform text-theme-light-primary dark:text-theme-dark-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            <div id="help-content" class="hidden p-4 bg-theme-light-surfaceAlt/50 dark:bg-theme-dark-surfaceAlt/30 border-t border-theme-light-border dark:border-theme-dark-border/10">
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-medium text-theme-light-text dark:text-theme-dark-text mb-2">Managing Wishlists</h3>
+                        <ul class="list-disc list-inside space-y-1 text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">
+                            <li>Create a new wishlist using the form below</li>
+                            <li>Click the wishlist header to expand/collapse it</li>
+                            <li>Use the "Delete Wishlist" button to remove a wishlist and all its items</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-theme-light-text dark:text-theme-dark-text mb-2">Managing Items</h3>
+                        <ul class="list-disc list-inside space-y-1 text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">
+                            <li>Add items using the form inside each wishlist</li>
+                            <li>Click "Mark Purchased" to mark items as bought</li>
+                            <li>Hover over "Purchased" to see when an item was bought</li>
+                            <li>Click item links to view them on the seller's website</li>
+                            <li>Use the delete button to remove individual items</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-theme-light-text dark:text-theme-dark-text mb-2">Tips</h3>
+                        <ul class="list-disc list-inside space-y-1 text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">
+                            <li>Use the theme toggle in the top-right to switch between light and dark modes</li>
+                            <li>Your theme preference will be saved for future visits</li>
+                            <li>All changes are saved automatically</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Create New Wishlist Form -->
         <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 p-8 border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
             <h2 class="text-2xl font-semibold mb-6 tracking-tight">Create New Wishlist</h2>

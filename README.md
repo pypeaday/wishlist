@@ -20,7 +20,9 @@ A modern, responsive wishlist application built with FastAPI and TailwindCSS. Cr
 
 - 📝 Create multiple wishlists for different people
 - 🔗 Add items with links to where they can be purchased
-- ✅ Mark items as purchased
+- ✅ Mark items as purchased with confirmation
+- 🗑️ Delete items and wishlists with double confirmation
+- 📅 Track when items were purchased
 - 🌓 Beautiful dark/light theme with smooth transitions
 - 💾 Theme preference persists across sessions
 - 📱 Fully responsive design
@@ -62,6 +64,27 @@ uvicorn main:app --reload
 ```
 http://localhost:8000
 ```
+
+## 🛠️ Usage
+
+### Managing Wishlists
+
+- **Create Wishlist**: Use the form at the top of the page to create a new wishlist with a name and person
+- **Delete Wishlist**: Click the "Delete Wishlist" button on any wishlist. For safety, you'll need to:
+  1. Confirm you want to delete the wishlist and all its items
+  2. Type the exact text "delete [wishlist name]" to confirm
+- **Collapse/Expand**: Click anywhere on the wishlist header to toggle visibility
+
+### Managing Items
+
+- **Add Items**: Use the form within each wishlist to add new items with optional links
+- **Mark as Purchased**: 
+  - Click "Mark Purchased" on any item
+  - Confirm the action in the confirmation dialog
+  - Hover over "Purchased" to see when it was purchased
+  - Can be toggled back to unpurchased with confirmation
+- **Delete Items**: Click the delete button on any item and confirm the action
+- **View Links**: Click on item links to open them in a new tab
 
 ## 🛠️ Technical Stack
 
@@ -109,14 +132,17 @@ wishlist/
 
 ## 🔄 API Endpoints
 
-The application provides a RESTful API for managing wishlists and items:
+The application provides several REST endpoints for managing wishlists and items:
 
-- `GET /api/wishlists`: Get all wishlists
-- `POST /api/wishlists`: Create a new wishlist
-- `GET /api/wishlists/{id}`: Get a specific wishlist
-- `POST /api/wishlists/{id}/items`: Add an item to a wishlist
-- `PUT /api/items/{id}`: Update an item (e.g., mark as purchased)
-- `DELETE /api/items/{id}`: Delete an item
+#### Wishlist Endpoints
+- `POST /wishlists/` - Create a new wishlist
+- `GET /wishlists/` - List all wishlists
+- `DELETE /wishlists/{wishlist_id}` - Delete a wishlist and all its items
+
+#### Item Endpoints
+- `POST /wishlists/{wishlist_id}/items/` - Add an item to a wishlist
+- `DELETE /items/{item_id}` - Delete a specific item
+- `POST /items/{item_id}/purchase` - Toggle an item's purchase status
 
 ## 🤝 Contributing
 

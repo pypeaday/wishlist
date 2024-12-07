@@ -75,8 +75,8 @@ async function fetchWishlists() {
             wishlistDiv.className = 'bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg border border-theme-light-border dark:border-theme-dark-border/20 transition-colors';
             wishlistDiv.innerHTML = `
                 <div class="p-6 border-b border-theme-light-border dark:border-theme-dark-border/10">
-                    <div class="flex justify-between items-center cursor-pointer group" onclick="toggleWishlist(${wishlist.id})">
-                        <div class="flex items-center gap-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-4 cursor-pointer group" onclick="toggleWishlist(${wishlist.id})">
                             <div class="flex items-center gap-3">
                                 <svg id="chevron-${wishlist.id}" class="w-5 h-5 transform transition-transform rotate-180 text-theme-light-primary dark:text-theme-dark-primary" 
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,8 +87,13 @@ async function fetchWishlists() {
                                     <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">For: ${wishlist.person}</p>
                                 </div>
                             </div>
+                            <span id="status-${wishlist.id}" class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm ml-4">Click to collapse</span>
                         </div>
-                        <span id="status-${wishlist.id}" class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">Click to collapse</span>
+                        <button onclick="deleteWishlist(${wishlist.id}, '${wishlist.name}', ${wishlist.items.length})"
+                            class="px-3 py-1 bg-theme-light-danger/20 text-theme-light-danger dark:bg-theme-dark-danger/20 dark:text-theme-dark-danger 
+                                   rounded hover:opacity-80 transition-opacity ml-4">
+                            Delete Wishlist
+                        </button>
                     </div>
                 </div>
                 
@@ -163,6 +168,34 @@ async function fetchWishlists() {
         });
     } catch (error) {
         console.error('Error fetching wishlists:', error);
+    }
+}
+
+async function deleteWishlist(wishlistId, wishlistName, itemCount) {
+    // First confirmation
+    if (!confirm(`Are you sure you want to delete the wishlist "${wishlistName}"?\nThis will delete ${itemCount} items.`)) {
+        return;
+    }
+    
+    // Second confirmation
+    const confirmText = `delete ${wishlistName}`;
+    const userInput = prompt(`To confirm deletion, please type "${confirmText}" below:`);
+    
+    if (userInput !== confirmText) {
+        alert("Deletion cancelled: text did not match.");
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/wishlists/${wishlistId}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        console.log('Delete result:', result);
+        fetchWishlists(); // Refresh the list
+    } catch (error) {
+        console.error('Error deleting wishlist:', error);
+        alert('Error deleting wishlist. Please try again.');
     }
 }
 
@@ -256,6 +289,20 @@ document.getElementById('add-wishlist').addEventListener('click', async () => {
         console.error('Error adding wishlist:', error);
     }
 });
+
+// Help section toggle
+function toggleHelp() {
+    const content = document.getElementById('help-content');
+    const chevron = document.getElementById('help-chevron');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.classList.add('rotate-180');
+    } else {
+        content.classList.add('hidden');
+        chevron.classList.remove('rotate-180');
+    }
+}
 
 // Initial load
 fetchWishlists();
