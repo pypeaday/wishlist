@@ -1,5 +1,65 @@
 // script.js
 
+// Theme handling
+function setTheme(theme) {
+    if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    }
+    updateThemeIcons();
+}
+
+function updateThemeIcons() {
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+    
+    if (document.documentElement.classList.contains('dark')) {
+        darkIcon.classList.add('hidden');
+        lightIcon.classList.remove('hidden');
+    } else {
+        lightIcon.classList.add('hidden');
+        darkIcon.classList.remove('hidden');
+    }
+}
+
+// Initialize theme
+if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    setTheme('dark');
+} else {
+    setTheme('light');
+}
+
+// Theme toggle functionality
+const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+// Change the icons inside the button based on previous settings
+if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    themeToggleLightIcon.classList.remove('hidden');
+    themeToggleDarkIcon.classList.add('hidden');
+} else {
+    themeToggleLightIcon.classList.add('hidden');
+    themeToggleDarkIcon.classList.remove('hidden');
+}
+
+document.getElementById('theme-toggle').addEventListener('click', function() {
+    // Toggle icons
+    themeToggleDarkIcon.classList.toggle('hidden');
+    themeToggleLightIcon.classList.toggle('hidden');
+
+    // If is dark mode
+    if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+    }
+});
+
 async function fetchWishlists() {
     try {
         const response = await fetch('/wishlists/');
@@ -12,70 +72,78 @@ async function fetchWishlists() {
         wishlists.forEach(wishlist => {
             console.log('Processing wishlist:', wishlist);
             const wishlistDiv = document.createElement('div');
-            wishlistDiv.className = 'bg-white p-6 rounded-lg shadow';
+            wishlistDiv.className = 'bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg border border-theme-light-border dark:border-theme-dark-border/20 transition-colors';
             wishlistDiv.innerHTML = `
-                <div class="flex justify-between items-center mb-4 cursor-pointer hover:bg-gray-50 p-2 rounded" 
-                    onclick="toggleWishlist(${wishlist.id})">
-                    <div class="flex items-center gap-4 flex-1">
-                        <div class="flex items-center gap-2">
-                            <svg id="chevron-${wishlist.id}" class="w-6 h-6 transform transition-transform rotate-180" 
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            <div>
-                                <h2 class="text-2xl font-semibold">${wishlist.name}</h2>
-                                <p class="text-gray-600">For: ${wishlist.person}</p>
+                <div class="p-6 border-b border-theme-light-border dark:border-theme-dark-border/10">
+                    <div class="flex justify-between items-center cursor-pointer group" onclick="toggleWishlist(${wishlist.id})">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-3">
+                                <svg id="chevron-${wishlist.id}" class="w-5 h-5 transform transition-transform rotate-180 text-theme-light-primary dark:text-theme-dark-primary" 
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                                <div>
+                                    <h2 class="text-xl font-semibold text-theme-light-text dark:text-theme-dark-text group-hover:text-theme-light-primary dark:group-hover:text-theme-dark-primary transition-colors">${wishlist.name}</h2>
+                                    <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">For: ${wishlist.person}</p>
+                                </div>
                             </div>
                         </div>
+                        <span id="status-${wishlist.id}" class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">Click to collapse</span>
                     </div>
-                    <span id="status-${wishlist.id}" class="text-gray-500 text-sm">Click to collapse</span>
                 </div>
                 
-                <div id="wishlist-content-${wishlist.id}" class="border-t pt-4">
-                    <div class="flex gap-4 items-center mb-4">
+                <div class="p-6 bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt/30">
+                    <div class="flex gap-4 mb-6">
                         <input type="text" placeholder="Item Name" 
-                            class="p-2 border rounded" id="new-item-name-${wishlist.id}">
+                            class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surface dark:bg-theme-dark-surface border border-theme-light-border dark:border-theme-dark-border/20
+                                   text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                                   focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
+                                   transition-colors">
                         <input type="text" placeholder="Item Link" 
-                            class="p-2 border rounded" id="new-item-link-${wishlist.id}">
-                        <button onclick="addItem(${wishlist.id})" 
-                            class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                            class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surface dark:bg-theme-dark-surface border border-theme-light-border dark:border-theme-dark-border/20
+                                   text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                                   focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
+                                   transition-colors">
+                        <button class="px-6 py-2 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
+                                     hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl">
                             Add Item
                         </button>
                     </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full table-auto">
+                    <div class="overflow-hidden rounded-lg border border-theme-light-border dark:border-theme-dark-border/10">
+                        <table class="w-full">
                             <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="px-4 py-2 text-left">Item</th>
-                                    <th class="px-4 py-2 text-left">Link</th>
-                                    <th class="px-4 py-2 text-center">Status</th>
-                                    <th class="px-4 py-2 text-center">Actions</th>
+                                <tr class="bg-theme-light-surface dark:bg-theme-dark-surface/50">
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-theme-light-textMuted dark:text-theme-dark-textMuted">Item</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-theme-light-textMuted dark:text-theme-dark-textMuted">Link</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-theme-light-textMuted dark:text-theme-dark-textMuted">Status</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-theme-light-textMuted dark:text-theme-dark-textMuted">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="divide-y divide-theme-light-border dark:divide-theme-dark-border/10">
                                 ${wishlist.items ? wishlist.items.map(item => `
-                                    <tr class="border-t ${item.purchased ? 'bg-gray-50' : ''}">
-                                        <td class="px-4 py-2 ${item.purchased ? 'line-through text-gray-500' : ''}">${item.name}</td>
-                                        <td class="px-4 py-2 ${item.purchased ? 'line-through text-gray-500' : ''}">
-                                            ${item.link ? 
-                                                item.purchased ?
-                                                    `<span class="text-gray-500">${item.link}</span>` :
-                                                    `<a href="${item.link}" target="_blank" 
-                                                        class="text-blue-500 hover:text-blue-700">View Item</a>`
-                                                : ''}
+                                    <tr class="border-t border-theme-light-border dark:border-theme-dark-border ${item.purchased ? 'bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt' : ''}">
+                                        <td class="px-4 py-2 ${item.purchased ? 'line-through text-theme-light-textMuted dark:text-theme-dark-textMuted' : 'text-theme-light-text dark:text-theme-dark-text'}">
+                                            ${item.name}
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            <a href="${item.link}" target="_blank" 
+                                                class="${item.purchased 
+                                                    ? 'line-through text-theme-light-textMuted dark:text-theme-dark-textMuted pointer-events-none' 
+                                                    : 'text-theme-light-primary dark:text-theme-dark-primary hover:text-theme-light-secondary dark:hover:text-theme-dark-secondary'}">${item.link}</a>
                                         </td>
                                         <td class="px-4 py-2 text-center">
-                                            <button onclick="togglePurchased(${item.id})" 
-                                                class="px-3 py-1 rounded ${item.purchased ? 
-                                                    'bg-gray-200 text-gray-700' : 
-                                                    'bg-yellow-500 text-white hover:bg-yellow-600'}">
+                                            <button onclick="togglePurchased(${item.id})"
+                                                class="${item.purchased 
+                                                    ? 'bg-theme-light-success/20 text-theme-light-success dark:bg-theme-dark-success/20 dark:text-theme-dark-success' 
+                                                    : 'bg-theme-light-warning/20 text-theme-light-warning dark:bg-theme-dark-warning/20 dark:text-theme-dark-warning'} 
+                                                    px-3 py-1 rounded hover:opacity-80 transition-opacity">
                                                 ${item.purchased ? 'Purchased' : 'Mark Purchased'}
                                             </button>
                                         </td>
                                         <td class="px-4 py-2 text-center">
                                             <button onclick="deleteItem(${item.id})" 
-                                                class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                                class="bg-theme-light-danger/20 text-theme-light-danger dark:bg-theme-dark-danger/20 dark:text-theme-dark-danger px-3 py-1 rounded hover:opacity-80 transition-opacity">
                                                 Delete
                                             </button>
                                         </td>
