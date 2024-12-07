@@ -68,35 +68,34 @@ async function fetchWishlists() {
         
         const wishlistsDiv = document.getElementById('wishlists-container');
         wishlistsDiv.innerHTML = '';
-        wishlistsDiv.className = 'space-y-6 max-w-3xl mx-auto';
         
         wishlists.forEach(wishlist => {
             console.log('Processing wishlist:', wishlist);
             const wishlistDiv = document.createElement('div');
-            wishlistDiv.className = 'bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg';
+            wishlistDiv.className = 'bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-6';
             wishlistDiv.innerHTML = `
-                <div class="p-4 sm:p-6">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="flex items-center gap-4 cursor-pointer group flex-1 min-w-0" onclick="toggleWishlist(${wishlist.id})">
+                <div class="p-6">
+                    <div class="flex justify-between items-center gap-4">
+                        <div class="flex items-center gap-4 cursor-pointer group flex-1" onclick="toggleWishlist(${wishlist.id})">
                             <svg id="chevron-${wishlist.id}" class="w-5 h-5 transform transition-transform rotate-180 text-theme-light-primary dark:text-theme-dark-primary flex-shrink-0" 
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
-                            <div class="min-w-0">
-                                <h2 class="text-xl font-semibold text-theme-light-text dark:text-theme-dark-text group-hover:text-theme-light-primary dark:group-hover:text-theme-dark-primary transition-colors truncate">${wishlist.name}</h2>
-                                <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm truncate">For: ${wishlist.person}</p>
+                            <div>
+                                <h2 class="text-xl font-semibold text-theme-light-text dark:text-theme-dark-text group-hover:text-theme-light-primary dark:group-hover:text-theme-dark-primary transition-colors">${wishlist.name}</h2>
+                                <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm">For: ${wishlist.person}</p>
                             </div>
                         </div>
                         <button onclick="deleteWishlist(${wishlist.id}, '${wishlist.name}', ${wishlist.items.length})"
-                            class="px-3 py-1.5 bg-theme-light-danger/10 text-theme-light-danger dark:bg-theme-dark-danger/10 dark:text-theme-dark-danger 
-                                   rounded-lg hover:opacity-80 transition-opacity text-sm whitespace-nowrap flex-shrink-0">
-                            Delete
+                            class="px-4 py-2 bg-theme-light-danger/10 text-theme-light-danger dark:bg-theme-dark-danger/10 dark:text-theme-dark-danger 
+                                   rounded-lg hover:opacity-80 transition-opacity text-sm">
+                            Delete Wishlist
                         </button>
                     </div>
                 </div>
                 
-                <div id="wishlist-content-${wishlist.id}" class="hidden border-t border-theme-light-border dark:border-theme-dark-border/10">
-                    <div class="p-4 sm:p-6 space-y-4">
+                <div id="wishlist-content-${wishlist.id}" class="border-t border-theme-light-border dark:border-theme-dark-border/10">
+                    <div class="p-6 space-y-6">
                         <form onsubmit="addItem(${wishlist.id}, event)" class="flex flex-col sm:flex-row gap-4">
                             <input type="text" id="new-item-name-${wishlist.id}" placeholder="Item Name" required
                                 class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt 
@@ -115,12 +114,12 @@ async function fetchWishlists() {
                             <button type="submit" 
                                 class="px-6 py-2 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
                                        hover:opacity-90 transition-all duration-200 font-medium shadow-md hover:shadow-lg
-                                       w-full sm:w-auto whitespace-nowrap">
+                                       w-full sm:w-auto">
                                 Add Item
                             </button>
                         </form>
                         
-                        <div class="overflow-x-auto rounded-lg border border-theme-light-border dark:border-theme-dark-border/10">
+                        <div class="overflow-hidden rounded-lg border border-theme-light-border dark:border-theme-dark-border/10">
                             <table class="w-full">
                                 <thead class="bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt">
                                     <tr>
@@ -163,13 +162,6 @@ async function fetchWishlists() {
                                             </td>
                                         </tr>
                                     `).join('')}
-                                    ${wishlist.items.length === 0 ? `
-                                        <tr>
-                                            <td colspan="4" class="px-4 py-8 text-center text-theme-light-textMuted dark:text-theme-dark-textMuted">
-                                                No items in this wishlist yet
-                                            </td>
-                                        </tr>
-                                    ` : ''}
                                 </tbody>
                             </table>
                         </div>

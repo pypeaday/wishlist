@@ -119,30 +119,95 @@
         </div>
 
         <!-- Create New Wishlist Form -->
-        <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 p-8 border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
-            <h2 class="text-2xl font-semibold mb-6 tracking-tight">Create New Wishlist</h2>
-            <div class="flex gap-4">
-                <input type="text" id="wishlist-name" placeholder="Wishlist Name" 
+        <div class="bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg mb-8 p-4 sm:p-8 border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
+            <h2 class="text-xl sm:text-2xl font-semibold mb-6 tracking-tight">Create New Wishlist</h2>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <input type="text" id="wishlist-name" placeholder="Wishlist Name" required
                     class="flex-1 px-4 py-3 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt border border-theme-light-border dark:border-theme-dark-border/20
                            text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
                            focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
                            transition-colors">
-                <input type="text" id="wishlist-person" placeholder="Person's Name" 
+                <input type="text" id="wishlist-person" placeholder="Person's Name" required
                     class="flex-1 px-4 py-3 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt border border-theme-light-border dark:border-theme-dark-border/20
                            text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
                            focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
                            transition-colors">
                 <button id="add-wishlist" 
-                    class="px-8 py-3 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
-                           hover:opacity-90 transition-all font-medium shadow-lg hover:shadow-xl">
+                    class="px-6 py-3 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg 
+                           hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl
+                           w-full sm:w-auto">
                     Create Wishlist
                 </button>
             </div>
         </div>
 
         <!-- Wishlists Container -->
-        <div id="wishlists" class="space-y-6">
-            <!-- Wishlists will be inserted here -->
+        <div id="wishlists-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Wishlist Template -->
+            <template id="wishlist-template">
+                <div class="wishlist bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg p-4 sm:p-6 
+                            border border-theme-light-border dark:border-theme-dark-border/20 transition-colors">
+                    <div class="flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg sm:text-xl font-semibold mb-1 tracking-tight wishlist-name"></h3>
+                                <p class="text-sm text-theme-light-textMuted dark:text-theme-dark-textMuted wishlist-person"></p>
+                            </div>
+                            <button class="delete-wishlist-btn text-theme-light-danger dark:text-theme-dark-danger hover:opacity-80 transition-opacity">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="items-container space-y-4 mb-4 flex-grow">
+                            <!-- Items will be inserted here -->
+                        </div>
+
+                        <div class="add-item-form">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="text" placeholder="Item Name" required
+                                    class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt 
+                                           border border-theme-light-border dark:border-theme-dark-border/20
+                                           text-theme-light-text dark:text-theme-dark-text 
+                                           placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                                           focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
+                                           transition-colors">
+                                <input type="text" placeholder="Link (Optional)"
+                                    class="flex-1 px-4 py-2 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt 
+                                           border border-theme-light-border dark:border-theme-dark-border/20
+                                           text-theme-light-text dark:text-theme-dark-text 
+                                           placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted/70
+                                           focus:outline-none focus:ring-2 focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary/50
+                                           transition-colors">
+                                <button class="add-item-btn px-6 py-2 bg-theme-light-primary dark:bg-theme-dark-primary text-white rounded-lg
+                                               hover:opacity-90 transition-all duration-200 font-medium shadow-md hover:shadow-lg
+                                               w-full sm:w-auto">
+                                    Add Item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Item Template -->
+            <template id="item-template">
+                <div class="item flex items-start gap-3 p-3 rounded-lg bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt
+                            border border-theme-light-border dark:border-theme-dark-border/20">
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <h4 class="font-medium text-theme-light-text dark:text-theme-dark-text truncate"></h4>
+                            <button class="delete-item-btn text-theme-light-danger dark:text-theme-dark-danger hover:opacity-80 transition-opacity flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                </svg>
+                            </button>
+                        </div>
+                        <a href="#" target="_blank" class="item-link text-sm text-theme-light-primary dark:text-theme-dark-primary hover:underline truncate block"></a>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
     <script src="/static/script.js"></script>

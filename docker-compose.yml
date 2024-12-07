@@ -8,5 +8,5 @@ services:
       - WISHLIST_PORT=8000
       - WISHLIST_DB_PATH=/app/data/wishlists.db
     volumes:
-      - .:/app 
+      - .:/app
     restart: unless-stopped
