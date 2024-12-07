@@ -1,0 +1,12 @@
+services:
+  wishlist:
+    build: .
+    ports:
+      - "${WISHLIST_PORT:-8000}:8000"
+    environment:
+      - WISHLIST_HOST=0.0.0.0
+      - WISHLIST_PORT=8000
+      - WISHLIST_DB_PATH=/app/data/wishlists.db
+    volumes:
+      - .:/app 
+    restart: unless-stopped

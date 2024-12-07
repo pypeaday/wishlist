@@ -31,12 +31,30 @@ A modern, responsive wishlist application built with FastAPI and TailwindCSS. Cr
 
 ## 🚀 Getting Started
 
+### Configuration
+
+The app can be configured using environment variables:
+
+- `WISHLIST_PORT`: Port to run the server on (default: 8000)
+- `WISHLIST_HOST`: Host to bind to (default: 0.0.0.0)
+- `WISHLIST_DB_PATH`: Path to SQLite database file (default: ./data/wishlists.db)
+
+### Data Storage
+
+The application stores all data in an SQLite database located in the `data` directory. This ensures:
+- Data persistence across application restarts
+- Easy backup and restore
+- Clean separation of code and data
+- Compatibility with Docker volumes
+
+When running with Docker, the database is automatically stored in a named volume (`wishlist_data`).
+
 ### Prerequisites
 
 - Python 3.7+
 - pip (Python package manager)
 
-### Installation
+### Running Locally
 
 1. Clone the repository:
 ```bash
@@ -55,14 +73,56 @@ source .venv/bin/activate  # On Windows: .\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Start the server:
+4. Run the application:
 ```bash
-uvicorn main:app --reload
+python app.py
 ```
 
-5. Open your browser and navigate to:
+Or with custom port:
+```bash
+WISHLIST_PORT=8080 python app.py
 ```
-http://localhost:8000
+
+### Docker Deployment
+
+#### Using Docker Compose (Recommended)
+
+1. Start the application:
+```bash
+docker-compose up -d
+```
+
+2. Access the app at http://localhost:8000
+
+To use a different port:
+```bash
+WISHLIST_PORT=8080 docker-compose up -d
+```
+
+#### Using Docker Directly
+
+1. Build the image:
+```bash
+docker build -t wishlist-app .
+```
+
+2. Run the container:
+```bash
+docker run -d \
+  -p 8000:8000 \
+  -v wishlist_data:/app/data \
+  --name wishlist \
+  wishlist-app
+```
+
+Or with custom port:
+```bash
+docker run -d \
+  -e WISHLIST_PORT=8080 \
+  -p 8080:8080 \
+  -v wishlist_data:/app/data \
+  --name wishlist \
+  wishlist-app
 ```
 
 ## 🛠️ Usage

@@ -178,5 +178,12 @@ pyrightconfig.json
 *.sqlite
 *.sqlite3
 
+# Database
+data/*.db
+wishlists.db
+
+# Keep data directory
+!data/.gitkeep
+
 # End of https://www.toptal.com/developers/gitignore/api/python
 n

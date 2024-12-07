@@ -9,15 +9,15 @@ from typing import Optional
 from datetime import datetime
 import os
 
-# Get absolute path for database
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATABASE_PATH = os.path.join(BASE_DIR, "wishlists.db")
-DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+# Database configuration
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+DB_PATH = os.getenv("WISHLIST_DB_PATH", os.path.join(DATA_DIR, "wishlists.db"))
 
-print(f"Using database at: {DATABASE_PATH}")
+print(f"Using database at: {DB_PATH}")
 
 engine = create_engine(
-    DATABASE_URL, 
+    f"sqlite:///{DB_PATH}", 
     connect_args={"check_same_thread": False},
     echo=True  # This will log all SQL statements
 )
@@ -55,7 +55,7 @@ class Item(Base):
     wishlist = relationship("Wishlist", back_populates="items")
 
 # Check if the database file exists
-if not os.path.exists(DATABASE_PATH):
+if not os.path.exists(DB_PATH):
     print("Creating new database...")
     Base.metadata.create_all(bind=engine)
 else:
@@ -179,4 +179,11 @@ async def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    import os
+    
+    # Get configuration from environment variables with defaults
+    HOST = os.getenv("WISHLIST_HOST", "0.0.0.0")
+    PORT = int(os.getenv("WISHLIST_PORT", "8000"))
+    
+    print(f"Starting Wishlist App on http://{HOST}:{PORT}")
+    uvicorn.run("app:app", host=HOST, port=PORT, reload=True)
