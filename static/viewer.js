@@ -81,6 +81,25 @@ async function switchRole() {
     }
 }
 
+// Keep track of expanded wishlists
+let expandedWishlists = new Set();
+
+function toggleWishlist(wishlistId) {
+    const content = document.getElementById(`wishlist-content-${wishlistId}`);
+    const chevron = document.getElementById(`chevron-${wishlistId}`);
+    const isHidden = content.classList.contains('hidden');
+    
+    if (isHidden) {
+        content.classList.remove('hidden');
+        chevron.classList.remove('rotate-180');
+        expandedWishlists.add(wishlistId);
+    } else {
+        content.classList.add('hidden');
+        chevron.classList.add('rotate-180');
+        expandedWishlists.delete(wishlistId);
+    }
+}
+
 async function togglePurchased(itemId, itemName, currentStatus) {
     let message = currentStatus ? 
         `Are you sure you want to mark "${itemName}" as not purchased?` :
@@ -96,7 +115,16 @@ async function togglePurchased(itemId, itemName, currentStatus) {
             if (response.ok) {
                 const result = await response.json();
                 console.log('Purchase toggle result:', result);
-                fetchWishlists();
+                
+                // Update just the button status without refreshing the whole list
+                const button = document.querySelector(`button[data-item-id="${itemId}"]`);
+                if (button) {
+                    const newStatus = result.purchased;
+                    button.className = newStatus ? 
+                        'bg-theme-light-success/10 text-theme-light-success dark:bg-theme-dark-success/10 dark:text-theme-dark-success px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity' : 
+                        'bg-theme-light-warning/10 text-theme-light-warning dark:bg-theme-dark-warning/10 dark:text-theme-dark-warning px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity';
+                    button.textContent = newStatus ? 'Purchased' : 'Not Purchased';
+                }
             } else {
                 console.error('Failed to toggle purchase status:', response.status, response.statusText);
                 const errorText = await response.text();
@@ -124,21 +152,19 @@ async function fetchWishlists() {
             wishlistDiv.className = 'bg-theme-light-surface dark:bg-theme-dark-surface rounded-xl shadow-lg dark:shadow-dark-lg';
             wishlistDiv.innerHTML = `
                 <div class="p-4 sm:p-6">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="flex items-center gap-4 cursor-pointer group flex-1 min-w-0" onclick="toggleWishlist(${wishlist.id})">
-                            <svg id="chevron-${wishlist.id}" class="w-5 h-5 transform transition-transform rotate-180 text-theme-light-primary dark:text-theme-dark-primary flex-shrink-0" 
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                            <div class="min-w-0">
-                                <h2 class="text-xl font-semibold text-theme-light-text dark:text-theme-dark-text group-hover:text-theme-light-primary dark:group-hover:text-theme-dark-primary transition-colors truncate">${wishlist.name}</h2>
-                                <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm truncate">For: ${wishlist.person}</p>
-                            </div>
+                    <div class="flex items-center gap-4 cursor-pointer group flex-1 min-w-0" onclick="toggleWishlist(${wishlist.id})">
+                        <svg id="chevron-${wishlist.id}" class="w-5 h-5 transform transition-transform rotate-180 text-theme-light-primary dark:text-theme-dark-primary flex-shrink-0" 
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <div class="min-w-0">
+                            <h2 class="text-xl font-semibold text-theme-light-text dark:text-theme-dark-text group-hover:text-theme-light-primary dark:group-hover:text-theme-dark-primary transition-colors truncate">${wishlist.name}</h2>
+                            <p class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-sm truncate">For: ${wishlist.person}</p>
                         </div>
                     </div>
                 </div>
                 
-                <div id="wishlist-content-${wishlist.id}" class="hidden border-t border-theme-light-border dark:border-theme-dark-border/10">
+                <div id="wishlist-content-${wishlist.id}" class="${expandedWishlists.has(wishlist.id) ? '' : 'hidden'} border-t border-theme-light-border dark:border-theme-dark-border/10">
                     <div class="p-4 sm:p-6 space-y-4">
                         <div class="overflow-x-auto rounded-lg border border-theme-light-border dark:border-theme-dark-border/10">
                             <table class="w-full">
@@ -184,6 +210,7 @@ async function fetchWishlists() {
                                             </td>
                                             <td class="px-4 py-4 sm:py-3 text-center">
                                                 <button onclick="togglePurchased(${item.id}, '${item.name}', ${item.purchased})"
+                                                    data-item-id="${item.id}"
                                                     class="${item.purchased ? 
                                                         'bg-theme-light-success/10 text-theme-light-success dark:bg-theme-dark-success/10 dark:text-theme-dark-success' : 
                                                         'bg-theme-light-warning/10 text-theme-light-warning dark:bg-theme-dark-warning/10 dark:text-theme-dark-warning'} 
@@ -207,23 +234,17 @@ async function fetchWishlists() {
                 </div>
             `;
             wishlistsDiv.appendChild(wishlistDiv);
+            
+            // Restore expanded state
+            if (expandedWishlists.has(wishlist.id)) {
+                const content = document.getElementById(`wishlist-content-${wishlist.id}`);
+                const chevron = document.getElementById(`chevron-${wishlist.id}`);
+                if (content) content.classList.remove('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+            }
         });
     } catch (error) {
         console.error('Error fetching wishlists:', error);
-    }
-}
-
-function toggleWishlist(wishlistId) {
-    const content = document.getElementById(`wishlist-content-${wishlistId}`);
-    const chevron = document.getElementById(`chevron-${wishlistId}`);
-    const isHidden = content.classList.contains('hidden');
-    
-    if (isHidden) {
-        content.classList.remove('hidden');
-        chevron.classList.remove('rotate-180');
-    } else {
-        content.classList.add('hidden');
-        chevron.classList.add('rotate-180');
     }
 }
 

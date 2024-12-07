@@ -158,7 +158,16 @@ async function togglePurchased(itemId, itemName, currentStatus) {
             if (response.ok) {
                 const result = await response.json();
                 console.log('Purchase toggle result:', result);
-                fetchWishlists();
+                
+                // Update just the button status without refreshing the whole list
+                const button = document.querySelector(`button[data-item-id="${itemId}"]`);
+                if (button) {
+                    const newStatus = result.purchased;
+                    button.className = newStatus ? 
+                        'bg-theme-light-success/10 text-theme-light-success dark:bg-theme-dark-success/10 dark:text-theme-dark-success px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity' : 
+                        'bg-theme-light-warning/10 text-theme-light-warning dark:bg-theme-dark-warning/10 dark:text-theme-dark-warning px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity';
+                    button.textContent = newStatus ? 'Purchased' : 'Not Purchased';
+                }
             } else {
                 console.error('Failed to toggle purchase status:', response.status, response.statusText);
                 const errorText = await response.text();
@@ -205,7 +214,7 @@ async function fetchWishlists() {
                     </div>
                 </div>
                 
-                <div id="wishlist-content-${wishlist.id}" class="hidden border-t border-theme-light-border dark:border-theme-dark-border/10">
+                <div id="wishlist-content-${wishlist.id}" class="${expandedWishlists.has(wishlist.id) ? '' : 'hidden'} border-t border-theme-light-border dark:border-theme-dark-border/10">
                     <div class="p-4 sm:p-6 space-y-4">
                         <form onsubmit="addItem(${wishlist.id}, event)" class="flex flex-col sm:flex-row gap-4">
                             <input type="text" id="new-item-name-${wishlist.id}" placeholder="Item Name" required
@@ -275,6 +284,7 @@ async function fetchWishlists() {
                                             </td>
                                             <td class="px-4 py-4 sm:py-3 text-center">
                                                 <button onclick="togglePurchased(${item.id}, '${item.name}', ${item.purchased})"
+                                                    data-item-id="${item.id}"
                                                     class="${item.purchased ? 
                                                         'bg-theme-light-success/10 text-theme-light-success dark:bg-theme-dark-success/10 dark:text-theme-dark-success' : 
                                                         'bg-theme-light-warning/10 text-theme-light-warning dark:bg-theme-dark-warning/10 dark:text-theme-dark-warning'} 
@@ -314,6 +324,8 @@ async function fetchWishlists() {
     }
 }
 
+let expandedWishlists = new Set();
+
 function toggleWishlist(wishlistId) {
     const content = document.getElementById(`wishlist-content-${wishlistId}`);
     const chevron = document.getElementById(`chevron-${wishlistId}`);
@@ -322,9 +334,11 @@ function toggleWishlist(wishlistId) {
     if (isHidden) {
         content.classList.remove('hidden');
         chevron.classList.remove('rotate-180');
+        expandedWishlists.add(wishlistId);
     } else {
         content.classList.add('hidden');
         chevron.classList.add('rotate-180');
+        expandedWishlists.delete(wishlistId);
     }
 }
 
