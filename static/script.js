@@ -131,10 +131,31 @@ async function fetchWishlists() {
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-theme-light-border dark:divide-theme-dark-border/10">
-                                    ${wishlist.items.map(item => `
-                                        <tr class="bg-theme-light-surface dark:bg-theme-dark-surface">
-                                            <td class="px-4 py-3 text-theme-light-text dark:text-theme-dark-text">${item.name}</td>
-                                            <td class="px-4 py-3 text-center hidden sm:table-cell">
+                                    ${wishlist.items.map((item, index) => `
+                                        <tr class="${index % 2 === 0 ? 
+                                            'bg-theme-light-surface dark:bg-theme-dark-surface' : 
+                                            'bg-theme-light-surfaceAlt dark:bg-theme-dark-surfaceAlt/50'} 
+                                            hover:bg-theme-light-primary/5 dark:hover:bg-theme-dark-primary/10 transition-colors">
+                                            <td class="px-4 py-4 sm:py-3 text-theme-light-text dark:text-theme-dark-text">
+                                                <div class="space-y-2">
+                                                    <div class="font-medium">${item.name}</div>
+                                                    ${item.link ? `
+                                                        <a href="${item.link}" target="_blank" 
+                                                            class="text-theme-light-primary dark:text-theme-dark-primary hover:opacity-80 
+                                                                   inline-flex items-center gap-1 text-sm bg-theme-light-primary/10 
+                                                                   dark:bg-theme-dark-primary/10 px-3 py-1.5 rounded-lg 
+                                                                   transition-all block sm:hidden">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+                                                                stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" 
+                                                                    d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                                            </svg>
+                                                            View Link
+                                                        </a>
+                                                    ` : ''}
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-4 sm:py-3 text-center hidden sm:table-cell">
                                                 ${item.link ? `
                                                     <a href="${item.link}" target="_blank" 
                                                         class="text-theme-light-primary dark:text-theme-dark-primary hover:underline">
@@ -142,18 +163,18 @@ async function fetchWishlists() {
                                                     </a>
                                                 ` : '-'}
                                             </td>
-                                            <td class="px-4 py-3 text-center">
+                                            <td class="px-4 py-4 sm:py-3 text-center">
                                                 <button onclick="togglePurchased(${item.id})"
                                                     class="${item.purchased ? 
                                                         'bg-theme-light-success/10 text-theme-light-success dark:bg-theme-dark-success/10 dark:text-theme-dark-success' : 
                                                         'bg-theme-light-warning/10 text-theme-light-warning dark:bg-theme-dark-warning/10 dark:text-theme-dark-warning'} 
-                                                        px-3 py-1 rounded text-sm hover:opacity-80 transition-opacity">
+                                                        px-3 py-1.5 rounded-lg text-sm hover:opacity-80 transition-opacity">
                                                     ${item.purchased ? 'Purchased' : 'Not Purchased'}
                                                 </button>
                                             </td>
-                                            <td class="px-4 py-3 text-center">
+                                            <td class="px-4 py-4 sm:py-3 text-center">
                                                 <button onclick="deleteItem(${item.id}, '${item.name}')"
-                                                    class="text-theme-light-danger dark:text-theme-dark-danger hover:opacity-80 transition-opacity">
+                                                    class="text-theme-light-danger dark:text-theme-dark-danger hover:opacity-80 transition-opacity p-1 hover:bg-theme-light-danger/10 dark:hover:bg-theme-dark-danger/10 rounded">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
                                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                         <path stroke-linecap="round" stroke-linejoin="round" 
