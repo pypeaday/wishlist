@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Wishlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            light: {
+                                primary: '#0066cc',
+                                surface: '#ffffff',
+                                surfaceAlt: '#f3f4f6',
+                                border: '#e5e7eb',
+                                text: '#111827',
+                                textMuted: '#6b7280',
+                                success: '#059669',
+                                warning: '#d97706',
+                                error: '#dc2626'
+                            },
+                            dark: {
+                                primary: '#60a5fa',
+                                surface: '#1f2937',
+                                surfaceAlt: '#374151',
+                                border: '#374151',
+                                text: '#f9fafb',
+                                textMuted: '#9ca3af',
+                                success: '#34d399',
+                                warning: '#fbbf24',
+                                error: '#f87171'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-theme-light-surfaceAlt dark:bg-theme-dark-surface min-h-screen">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="w-full max-w-md space-y-8 bg-theme-light-surface dark:bg-theme-dark-surface p-8 rounded-xl shadow-lg dark:shadow-dark-lg">
+            <div>
+                <h2 class="text-center text-3xl font-bold tracking-tight text-theme-light-text dark:text-theme-dark-text">
+                    Create your account
+                </h2>
+            </div>
+            <form class="mt-8 space-y-6" action="/register" method="POST">
+                <div class="space-y-4 rounded-md shadow-sm">
+                    <div>
+                        <label for="username" class="sr-only">Username</label>
+                        <input id="username" name="username" type="text" required 
+                            class="relative block w-full rounded-lg border border-theme-light-border dark:border-theme-dark-border/10 px-4 py-3 
+                                text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted 
+                                bg-theme-light-surface dark:bg-theme-dark-surfaceAlt focus:outline-none focus:ring-2 focus:ring-theme-light-primary 
+                                dark:focus:ring-theme-dark-primary"
+                            placeholder="Username">
+                    </div>
+                    <div>
+                        <label for="email" class="sr-only">Email (Optional)</label>
+                        <input id="email" name="email" type="email" 
+                            class="relative block w-full rounded-lg border border-theme-light-border dark:border-theme-dark-border/10 px-4 py-3 
+                                text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted 
+                                bg-theme-light-surface dark:bg-theme-dark-surfaceAlt focus:outline-none focus:ring-2 focus:ring-theme-light-primary 
+                                dark:focus:ring-theme-dark-primary"
+                            placeholder="Email (Optional)">
+                        <div class="text-theme-light-textMuted dark:text-theme-dark-textMuted text-xs">Optional: Add your email for password recovery</div>
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">Password</label>
+                        <input id="password" name="password" type="password" required
+                            class="relative block w-full rounded-lg border border-theme-light-border dark:border-theme-dark-border/10 px-4 py-3 
+                                text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted 
+                                bg-theme-light-surface dark:bg-theme-dark-surfaceAlt focus:outline-none focus:ring-2 focus:ring-theme-light-primary 
+                                dark:focus:ring-theme-dark-primary"
+                            placeholder="Password">
+                    </div>
+                    <div>
+                        <label for="confirm_password" class="sr-only">Confirm Password</label>
+                        <input id="confirm_password" name="confirm_password" type="password" required
+                            class="relative block w-full rounded-lg border border-theme-light-border dark:border-theme-dark-border/10 px-4 py-3 
+                                text-theme-light-text dark:text-theme-dark-text placeholder-theme-light-textMuted dark:placeholder-theme-dark-textMuted 
+                                bg-theme-light-surface dark:bg-theme-dark-surfaceAlt focus:outline-none focus:ring-2 focus:ring-theme-light-primary 
+                                dark:focus:ring-theme-dark-primary"
+                            placeholder="Confirm Password">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" 
+                        class="group relative flex w-full justify-center rounded-lg bg-theme-light-primary dark:bg-theme-dark-primary 
+                            px-4 py-3 text-sm font-semibold text-white hover:opacity-90 focus:outline-none focus:ring-2 
+                            focus:ring-theme-light-primary dark:focus:ring-theme-dark-primary focus:ring-offset-2">
+                        Create Account
+                    </button>
+                </div>
+            </form>
+            
+            <div class="text-center">
+                <p class="text-sm text-theme-light-textMuted dark:text-theme-dark-textMuted">
+                    Already have an account?
+                    <a href="/login" class="font-medium text-theme-light-primary dark:text-theme-dark-primary hover:opacity-80">
+                        Sign in here
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Theme handling
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Password confirmation validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm_password');
+            
+            if (password.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

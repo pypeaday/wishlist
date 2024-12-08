@@ -11,11 +11,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     WISHLIST_PORT=8000 \
     WISHLIST_DB_PATH=/app/data/wishlists.db
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+# Install system dependencies including sqlite3
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     build-essential \
     curl \
+    sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first to leverage Docker cache

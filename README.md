@@ -1,35 +1,69 @@
 # 🎁 Wishlist App
 
-A modern, responsive wishlist application built with FastAPI and TailwindCSS. Create and manage multiple wishlists for different people, track items, and mark them as purchased. Features a beautiful dark/light theme with smooth transitions and a clean, minimalist interface.
-
-## 📸 Screenshots
-
-### Dark Theme
-![Dark Theme](screenshots/dark-theme.png)
-*Dark theme with a wishlist expanded, showing items and the purchase status*
-
-### Light Theme
-![Light Theme](screenshots/light-theme.png)
-*Light theme showing multiple wishlists and the create wishlist form*
-
-### Mobile View
-![Mobile View](screenshots/mobile-view.png)
-*Responsive mobile view with the theme toggle*
+A modern, responsive wishlist application built with FastAPI and Bootstrap. Create and manage multiple wishlists for different people, track items, and mark them as purchased. Features a clean dark theme, user authentication, and separate creator/viewer interfaces.
 
 ## ✨ Features
 
-- 📝 Create multiple wishlists for different people
-- 🔗 Add items with links to where they can be purchased
-- ✅ Mark items as purchased with confirmation
-- 🗑️ Delete items and wishlists with double confirmation
-- 📅 Track when items were purchased
-- 🌓 Beautiful dark/light theme with smooth transitions
-- 💾 Theme preference persists across sessions
+### 👥 User Roles
+- **Creator Mode**
+  - 📝 Create and manage multiple wishlists
+  - 🔗 Add items with links to where they can be purchased
+  - 🗑️ Delete items and wishlists
+  - 🔄 Easy switching between creator and viewer modes
+  - 🔒 Secure authentication required
+
+- **Viewer Mode**
+  - 👀 View all available wishlists
+  - ✅ Mark items as purchased (with confirmation)
+  - ↩️ Unmark purchases if made by mistake
+  - 📅 See when items were purchased
+  - 🔓 No login required
+
+### 💫 UI Features
+- 🌙 Beautiful dark theme
 - 📱 Fully responsive design
-- 🎨 Modern UI with subtle animations and transitions
-- 🔒 SQLite database for data persistence
+- 🎨 Modern Bootstrap UI
+- ⚡ Collapsible wishlists that maintain state
+- 💭 Helpful tooltips and instructions
+- ✔️ Purchase confirmation dialogs
+- 🔄 Smooth transitions and animations
+
+### 🛠️ Technical Features
+- 🔒 JWT-based authentication
+- 📊 SQLite database for data persistence
+- 🔐 Secure password hashing
+- 🎯 Clear separation of creator/viewer interfaces
+- 🔄 RESTful API endpoints
+- 📱 Mobile-first responsive design
 
 ## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.8+
+- pip (Python package manager)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/wishlist.git
+cd wishlist
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Initialize the database:
+```bash
+python reset_db.py
+```
+
+4. Run the application:
+```bash
+python app.py
+```
 
 ### Configuration
 
@@ -38,190 +72,56 @@ The app can be configured using environment variables:
 - `WISHLIST_PORT`: Port to run the server on (default: 8000)
 - `WISHLIST_HOST`: Host to bind to (default: 0.0.0.0)
 - `WISHLIST_DB_PATH`: Path to SQLite database file (default: ./data/wishlists.db)
+- `SECRET_KEY`: Secret key for JWT token generation (required for auth)
 
-### Data Storage
-
-The application stores all data in an SQLite database located in the `data` directory. This ensures:
-- Data persistence across application restarts
-- Easy backup and restore
-- Clean separation of code and data
-- Compatibility with Docker volumes
-
-When running with Docker, the database is automatically stored in a named volume (`wishlist_data`).
-
-### Prerequisites
-
-- Python 3.7+
-- pip (Python package manager)
-
-### Running Locally
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/wishlist.git
-cd wishlist
-```
-
-2. Create a virtual environment (recommended):
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .\.venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-4. Run the application:
-```bash
-python app.py
-```
-
-Or with custom port:
-```bash
-WISHLIST_PORT=8080 python app.py
-```
-
-### Docker Deployment
-
-#### Using Docker Compose (Recommended)
-
-1. Start the application:
-```bash
-docker-compose up -d
-```
-
-2. Access the app at http://localhost:8000
-
-To use a different port:
-```bash
-WISHLIST_PORT=8080 docker-compose up -d
-```
-
-#### Using Docker Directly
-
-1. Build the image:
-```bash
-docker build -t wishlist-app .
-```
-
-2. Run the container:
-```bash
-docker run -d \
-  -p 8000:8000 \
-  -v wishlist_data:/app/data \
-  --name wishlist \
-  wishlist-app
-```
-
-Or with custom port:
-```bash
-docker run -d \
-  -e WISHLIST_PORT=8080 \
-  -p 8080:8080 \
-  -v wishlist_data:/app/data \
-  --name wishlist \
-  wishlist-app
-```
-
-## 🛠️ Usage
-
-### Managing Wishlists
-
-- **Create Wishlist**: Use the form at the top of the page to create a new wishlist with a name and person
-- **Delete Wishlist**: Click the "Delete Wishlist" button on any wishlist. For safety, you'll need to:
-  1. Confirm you want to delete the wishlist and all its items
-  2. Type the exact text "delete [wishlist name]" to confirm
-- **Collapse/Expand**: Click anywhere on the wishlist header to toggle visibility
-
-### Managing Items
-
-- **Add Items**: Use the form within each wishlist to add new items with optional links
-- **Mark as Purchased**: 
-  - Click "Mark Purchased" on any item
-  - Confirm the action in the confirmation dialog
-  - Hover over "Purchased" to see when it was purchased
-  - Can be toggled back to unpurchased with confirmation
-- **Delete Items**: Click the delete button on any item and confirm the action
-- **View Links**: Click on item links to open them in a new tab
-
-## 🛠️ Technical Stack
-
-### Backend
-- **FastAPI**: Modern, fast web framework for building APIs with Python
-- **SQLAlchemy**: SQL toolkit and ORM
-- **Pydantic**: Data validation using Python type annotations
-- **SQLite**: Lightweight, serverless database
-
-### Frontend
-- **TailwindCSS**: Utility-first CSS framework
-- **Vanilla JavaScript**: Clean, modern JavaScript without dependencies
-- **Inter Font**: Beautiful, readable typography
-- **HTML5**: Semantic markup
-
-## 🎨 Theme System
-
-The app features a sophisticated theming system with carefully chosen colors for both dark and light modes:
-
-### Dark Theme
-- Background: Deep space blue (#171923)
-- Surface: Lighter space blue (#2A313C)
-- Primary: Soft nordic blue (#81A1C1)
-- Text: Nordic snow white (#ECEFF4)
-
-### Light Theme
-- Background: Soft white (#f5f5f4)
-- Surface: Pure white (#ffffff)
-- Primary: Muted blue (#5c7b9a)
-- Text: Deep gray (#3c4148)
-
-## 📁 Project Structure
+## 🏗️ Project Structure
 
 ```
 wishlist/
-├── main.py           # FastAPI application and routes
+├── app.py            # FastAPI application and routes
+├── auth.py           # Authentication logic
+├── database.py       # Database configuration
 ├── models.py         # SQLAlchemy models
 ├── schemas.py        # Pydantic schemas
+├── templates/
+│   ├── creator.html  # Creator interface
+│   ├── viewer.html   # Viewer interface
+│   ├── login.html    # Login page
+│   └── register.html # Registration page
 ├── static/
-│   └── script.js    # Frontend JavaScript
-├── index.html       # Main HTML template
-├── requirements.txt # Python dependencies
-└── README.md       # Project documentation
+│   └── styles/       # CSS styles
+└── data/
+    └── wishlists.db  # SQLite database
 ```
 
-## 🔄 API Endpoints
+## 🔒 Authentication
 
-The application provides several REST endpoints for managing wishlists and items:
+The app uses JWT (JSON Web Tokens) for authentication:
+- Tokens are stored in HTTP-only cookies
+- Passwords are securely hashed using bcrypt
+- Protected routes require valid JWT tokens
+- Automatic redirection to login for unauthorized access
 
-#### Wishlist Endpoints
-- `POST /wishlists/` - Create a new wishlist
-- `GET /wishlists/` - List all wishlists
-- `DELETE /wishlists/{wishlist_id}` - Delete a wishlist and all its items
+## 🎯 Usage
 
-#### Item Endpoints
-- `POST /wishlists/{wishlist_id}/items/` - Add an item to a wishlist
-- `DELETE /items/{item_id}` - Delete a specific item
-- `POST /items/{item_id}/purchase` - Toggle an item's purchase status
+1. **As a Creator:**
+   - Register/Login to access creator mode
+   - Create wishlists for different people/occasions
+   - Add items with optional purchase links
+   - Switch to viewer mode to see the public view
+   - Share the viewer link with others
+
+2. **As a Viewer:**
+   - No login required
+   - View all available wishlists
+   - Mark items as purchased
+   - See when items were purchased
+   - Unmark purchases if needed
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to submit issues and enhancement requests.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 📄 License
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [TailwindCSS](https://tailwindcss.com/) for the amazing utility-first CSS framework
-- [FastAPI](https://fastapi.tiangolo.com/) for the modern Python web framework
-- [Inter Font](https://rsms.me/inter/) for the beautiful typography
-- [Codeium](https://codeium.com/) for powering intelligent code assistance and generation
-- Special thanks to Cascade, the agentic AI assistant in Windsurf IDE, for pair programming support
+This project is licensed under the MIT License - see the LICENSE file for details.
